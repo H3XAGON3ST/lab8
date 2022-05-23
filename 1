@@ -1,0 +1,254 @@
+def get_index_with_bin_search(ls: list, element) -> int:
+    left: int = -1
+    right: int = len(ls)
+    while left < right - 1:
+        middle = (left + right) // 2
+        if ls[middle] < element:
+            left = middle
+        else:
+            right = middle
+
+    if right == len(ls):
+        return -1
+
+    if ls[right] == element:
+        return right
+    else:
+        return -1
+
+
+def get_index_with_bin_search_dev(ls: list, element) -> int:
+    left: int = -1
+    right: int = len(ls)
+
+    while left < right:
+        middle = ((right - left + 1) // 2) + left
+
+        if ls[middle] < element:
+            # print("-", left, middle, right, ls[middle], element)
+            left = middle
+        else:
+            # print("+", left, middle, right, ls[middle], element)
+            right = middle
+        # print("+", left, middle, right, ls[middle], element)
+
+        if right - left == 1 and ls[middle] == element:
+            return middle
+        elif right - left == 1 and ls[middle] != element:
+            return -1
+
+        if ls[middle] == element:
+            return middle
+    return -1
+
+
+def get_index_with_fibonacci_search(ls: list, element) -> int:
+    left: int = -1
+    right: int = len(ls)
+    while left < right - 1:
+        middle = (right + left) // 3
+
+        # print("-", left, middle, right, ls[middle], element)
+
+        if ls[middle] == element:
+            return middle
+        elif ls[middle] < element:
+            left = middle
+        else:
+            right = middle
+
+        if ls[right - 1] == element:
+            return right - 1
+
+        if left - middle < 1:
+            for i in range(left, right):
+                if ls[i] == element:
+                    return i
+            return -1
+
+    if right == len(ls):
+        return -1
+
+    if ls[right] == element:
+        return right
+    else:
+        return -1
+
+
+def sort_list_selected(ls: list, is_ascending: bool = True) -> list:
+    unready_list = ls.copy()
+    ready_list: list = []
+    max_num = min(ls)
+    min_num = max(ls)
+
+    index_num: int = 0
+
+    if len(unready_list) <= 1:
+        return unready_list
+
+    if not is_ascending:
+        for i in range(len(unready_list)):
+            if max_num < unready_list[i]:
+                max_num = unready_list[i]
+                index_num = i
+        ready_list.append(max_num)
+        unready_list.pop(index_num)
+        ready_list.extend(sort_list_selected(unready_list, is_ascending))
+        return ready_list
+    else:
+        for i in range(len(unready_list)):
+            if min_num > unready_list[i]:
+                min_num = unready_list[i]
+                index_num = i
+        ready_list.append(min_num)
+        unready_list.pop(index_num)
+        ready_list.extend(sort_list_selected(unready_list, is_ascending))
+
+        return ready_list
+
+
+def sort_list_shell(ls: list, is_ascending: bool = True) -> list:
+    right = len(ls)
+    step = len(ls) // 2
+    if is_ascending:
+        while step > 0:
+            for i in range(step, right, 1):
+                j = i
+                delta = j - step
+                while delta >= 0 and ls[delta] > ls[j]:
+                    ls[delta], ls[j] = ls[j], ls[delta]
+                    j = delta
+                    delta = j - step
+            step //= 2
+    else:
+        while step > 0:
+            for i in range(step, right, 1):
+                j = i
+                delta = j - step
+                while delta >= 0 and ls[delta] < ls[j]:
+                    ls[delta], ls[j] = ls[j], ls[delta]
+                    j = delta
+                    delta = j - step
+            step //= 2
+    return ls
+
+
+def sort_list_fast(ls: list, is_ascending: bool = True) -> list:
+    if len(ls) <= 1:
+        return ls
+
+    left: list = []
+    right: list = []
+
+    # random_point = random.choice(ls)
+    random_point = ls[(len(ls)-1) // 2]
+
+    if is_ascending:
+        for n in ls:
+            if n > random_point:
+                left.append(n)
+
+        medium: list = ls.count(random_point) * [random_point]
+
+        for n in ls:
+            if n < random_point:
+                right.append(n)
+    else:
+        for n in ls:
+            if n < random_point:
+                left.append(n)
+
+        medium: list = ls.count(random_point) * [random_point]
+
+        for n in ls:
+            if n > random_point:
+                right.append(n)
+
+    return sort_list_fast(left, is_ascending) + medium + sort_list_fast(right, is_ascending)
+
+
+def sort_list_bubble(ls: list, is_ascending: bool = True) -> list:
+    for k in range(len(ls) - 1):
+        counter: int = 0
+        for i in range(len(ls)-1):
+            if is_ascending:
+                if ls[i] > ls[i + 1]:
+                    _local_num = ls[i]
+                    ls[i] = ls[i + 1]
+                    ls[i + 1] = _local_num
+                    counter += 1
+            else:
+                if ls[i] < ls[i + 1]:
+                    _local_num = ls[i]
+                    ls[i] = ls[i + 1]
+                    ls[i + 1] = _local_num
+                    counter += 1
+        if counter == 0:
+            break
+    return ls
+
+# ================================
+
+
+def z1() -> None:
+    ls: list = [1, 2, 3, 5, 7, 9, 10]
+
+    for i in range(0, 12):
+        print(get_index_with_bin_search(ls, i), i, "- normal")
+        print(get_index_with_bin_search_dev(ls, i), i, "- dev")
+
+
+def z2() -> None:
+    ls: list = [1, 2, 3, 5, 7, 9, 10]
+
+    for i in range(0, 12):
+        print(get_index_with_fibonacci_search(ls, i), i)
+
+
+def z3() -> None:
+    lst: list = [1, 2, 1, -5, 7, -9, 11, 4, 6, 9]
+    print(sort_list_selected(lst))
+    print(sort_list_selected(lst, False))
+
+
+def z4() -> None:
+    ls: list = [1, 2, 1, -5, 7, -9, 11, 4, 6, 9]
+    print(sort_list_bubble(ls))
+    print(sort_list_bubble(ls, False))
+
+
+def z5() -> None:
+    ls: list = [1, 2, 1, -5, 7, -9, 11, 4, 6, 9]
+    print(sort_list_shell(ls.copy()))
+    print(sort_list_shell(ls.copy(), False))
+
+
+def z6() -> None:
+    ls: list = [1, 2, 1, -5, 7, -9, 11, 4, 6, 9]
+    print(sort_list_fast(ls.copy()))
+    print(sort_list_fast(ls.copy(), False))
+# =========== end funcs/procedures
+
+
+num: int = -1
+while num != 0:
+    print("1-6 номера заданий, 0 выход")
+    num = int(input("Введите номер задания "))
+
+    if num == 1:
+        z1()
+    elif num == 2:
+        z2()
+    elif num == 3:
+        z3()
+    elif num == 4:
+        z4()
+    elif num == 5:
+        z5()
+    elif num == 6:
+        z6()
+    elif num == 0:
+        print("Завершение программы")
+        break
+    else:
+        print("Неверное число")
